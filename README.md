@@ -2,6 +2,8 @@
 
 Use KidMotor V4 as i/o extender, I2C communication
 
+ > Use Arduino IDE for build uf2 file, needs [RP2 core for Arduino](https://github.com/earlephilhower/arduino-pico)
+
 ## Future
 
 Motor
