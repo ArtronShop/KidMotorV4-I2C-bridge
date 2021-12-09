@@ -109,7 +109,8 @@ Special function
     <tr>
       <td align=center>0x06</td>
       <td>ADC data high</td>
-      <td align=center colspan=8>ADC_VALUE_MSB</td>
+      <td align=center colspan=4>Reserved.</td>
+      <td align=center colspan=4>ADC_VALUE_MSB</td>
     </tr>
     <tr>
       <td align=center>0x07</td>
