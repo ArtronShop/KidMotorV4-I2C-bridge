@@ -206,7 +206,7 @@ Special function
       <td align=center>0x30</td>
       <td>Ultrasonic sensor pin select</td>
       <td align=center colspan=1>START</td>
-      <td align=center colspan=1>Reserved.</td>
+      <td align=center colspan=1>CONTI</td>
       <td align=center colspan=3>TRIG_PIN</td>
       <td align=center colspan=3>ECHO_PIN</td>
     </tr>
