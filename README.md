@@ -218,7 +218,7 @@ Special function
     <tr>
       <td align=center>0x32</td>
       <td>Ultrasonic Measurement result low</td>
-      <td align=center colspan=8>DISTANCE_IN_CM_LOW</td>
+      <td align=center colspan=8>DISTANCE_IN_CM_LSB</td>
     </tr>
     <tr>
       <td align=center>0x33 - 0x3F</td>
