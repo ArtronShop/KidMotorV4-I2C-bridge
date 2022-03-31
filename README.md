@@ -125,8 +125,7 @@ Special function
     <tr>
       <td align=center>0x10</td>
       <td>PWM1 value hight<sup>1</sup></td>
-      <td align=center colspan=4>Reserved.</td>
-      <td align=center colspan=4>PWM1_VALUE_MSB</td>
+      <td align=center colspan=8>PWM1_VALUE_MSB</td>
     </tr>
     <tr>
       <td align=center>0x11</td>
@@ -136,8 +135,7 @@ Special function
     <tr>
       <td align=center>0x12</td>
       <td>PWM2 value high<sup>1</sup></td>
-      <td align=center colspan=4>Reserved.</td>
-      <td align=center colspan=4>PWM2_VALUE_MSB</td>
+      <td align=center colspan=8>PWM2_VALUE_MSB</td>
     </tr>
     <tr>
       <td align=center>0x13</td>
@@ -147,8 +145,7 @@ Special function
    <tr>
       <td align=center>0x14</td>
       <td>PWM3 value high<sup>1</sup></td>
-      <td align=center colspan=4>Reserved.</td>
-      <td align=center colspan=4>PWM3_VALUE_MSB</td>
+      <td align=center colspan=8>PWM3_VALUE_MSB</td>
     </tr>
     <tr>
       <td align=center>0x15</td>
@@ -158,8 +155,7 @@ Special function
    <tr>
       <td align=center>0x16</td>
       <td>PWM4 value high<sup>1</sup></td>
-      <td align=center colspan=4>Reserved.</td>
-      <td align=center colspan=4>PWM4_VALUE_MSB</td>
+      <td align=center colspan=8>PWM4_VALUE_MSB</td>
     </tr>
     <tr>
       <td align=center>0x17</td>
@@ -169,8 +165,7 @@ Special function
    <tr>
       <td align=center>0x18</td>
       <td>PWM5 value high<sup>1</sup></td>
-      <td align=center colspan=4>Reserved.</td>
-      <td align=center colspan=4>PWM5_VALUE_MSB</td>
+      <td align=center colspan=8>PWM5_VALUE_MSB</td>
     </tr>
     <tr>
       <td align=center>0x19</td>
