@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <hardware/i2c.h>
 #include <hardware/gpio.h>
+#include <Servo.h>
 
 #define SELF_I2C_ADDR 0x08
 #define SCL_PIN 5
@@ -21,10 +22,21 @@
 #define SV2 19
 #define SV3 20
 
-uint8_t reg_data[30];
+int vPin_to_real_pin[8] = { -1, -1, -1, A0, A1, -1, -1, -1 };
+int vPin_to_digital_pin[8] = { D1, D2, D3, D4, D5, SV1, SV2, SV3 };
+
+uint8_t reg_data[256];
 
 void on_i2c_receive_handle(int);
 void on_i2c_request_handle();
+
+bool pwm_update[8] = { 
+  false, false, false, false, false, // D1 - D5, PWM
+  false, false, false // SV1 - SV3, Servo
+};
+
+Servo *myServo[3] = { NULL, NULL, NULL };
+// #define DEBUG_REGISTER
 
 void setup() {
   Serial.begin(9600);
@@ -68,10 +80,67 @@ void loop() {
   analogWrite(IN1B_PIN, (reg_data[0x00] & 0x80) == 0 ? (65535 - ((reg_data[0x00] & 0x7F) / 100.0 * 65535)) : 65535);
   analogWrite(IN2A_PIN, (reg_data[0x01] & 0x80) == 0 ? 65535 : (65535 - ((reg_data[0x01] & 0x7F) / 100.0 * 65535)));
   analogWrite(IN2B_PIN, (reg_data[0x01] & 0x80) == 0 ? (65535 - ((reg_data[0x01] & 0x7F) / 100.0 * 65535)) : 65535);
-   
+
+  // PWM update
+  for (uint8_t ch=0;ch<5;ch++) {
+    if (pwm_update[ch]) {
+      analogWrite(vPin_to_digital_pin[ch], (reg_data[0x10 + (ch * 2)] << 8) | reg_data[0x11 + (ch * 2)]);
+      pwm_update[ch] = false;
+    }
+  }
+
+  // Servo update
+  for (uint8_t ch=5;ch<8;ch++) {
+    if (pwm_update[ch]) {
+      uint8_t angle = reg_data[0x20 + (ch - 5)];
+      if ((!myServo[ch]) && angle != 255) {
+        myServo[ch] = new Servo();
+        myServo[ch]->attach(vPin_to_digital_pin[ch]);
+      }
+      if (angle < 255) {
+        myServo[ch]->write(angle);
+      } else {
+        delete myServo[ch];
+        myServo[ch] = NULL;
+      }
+      pwm_update[ch] = false;
+    }
+  }
+
+  // Ultrasonic sensor
+  if ((reg_data[0x30] & 0x80) != 0) { // START flag is SET
+    int trigPin = vPin_to_digital_pin[(reg_data[0x30] >> 3) & 0x07];
+    int echoPin = vPin_to_digital_pin[(reg_data[0x30] >> 0) & 0x07];
+    
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+    
+    // Clears the trigPin condition
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    // Reads the echoPin, returns the sound wave travel time in microseconds
+    uint16_t duration = pulseIn(echoPin, HIGH);
+    // Calculating the distance
+    uint16_t distance_cm = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
+    // Displays the distance on the Serial Monitor
+    Serial.print("Distance: ");
+    Serial.print(distance_cm);
+    Serial.println(" cm");
+    reg_data[0x31] = (distance_cm >> 8) & 0xFF;
+    reg_data[0x32] = distance_cm & 0xFF;
+    if ((reg_data[0x30] & 0x40) == 0) { // CONTI flag RESET
+      reg_data[0x30] &= ~0x80; // Set START flag to RESET
+    }
+  }
+
+  // UART
+
   // ADC Read
   if ((reg_data[0x05] & 0x80) != 0) { // ADC FLAG is SET ?
-    int vPin_to_real_pin[8] = { -1, -1, -1, A0, A1, -1, -1, -1 };
     int pin = vPin_to_real_pin[reg_data[0x05] & 0x07];
     uint16_t raw = 0;
     if (pin != -1) {
@@ -106,6 +175,10 @@ void on_i2c_receive_handle(int n) {
         digitalWrite(D3, dataIn & 0x04 ? HIGH : LOW);
         digitalWrite(D4, dataIn & 0x08 ? HIGH : LOW);
         digitalWrite(D5, dataIn & 0x10 ? HIGH : LOW);
+      } else if ((reg_offset >= 0x10) && (reg_offset <= 0x19)) {
+        pwm_update[(int)((reg_offset - 0x10) / 2)] = true;
+      } else if ((reg_offset >= 0x20) && (reg_offset <= 0x22)) {
+        pwm_update[(int)(reg_offset - 0x20) + 5] = true;
       }
       reg_data[reg_offset] = dataIn;
       reg_offset++;
@@ -118,10 +191,9 @@ void on_i2c_receive_handle(int n) {
 
 void on_i2c_request_handle() {
   if (reg_offset == 0x03) {
-    Wire.write((digitalRead(D5) << 4) | (digitalRead(D4) << 3) | (digitalRead(D3) << 2) | (digitalRead(D2) << 1) | (digitalRead(D1) << 0));
-  } else {
-    Wire.write(reg_data[reg_offset]);
+    reg_data[reg_offset] = (digitalRead(D5) << 4) | (digitalRead(D4) << 3) | (digitalRead(D3) << 2) | (digitalRead(D2) << 1) | (digitalRead(D1) << 0);
   }
+  Wire.write(reg_data[reg_offset]);
   reg_offset++;
   if (reg_offset >= sizeof(reg_data)) {
     reg_offset = 0;
