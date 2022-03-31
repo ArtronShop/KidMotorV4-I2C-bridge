@@ -18,19 +18,19 @@ D1 to D5 pin
 
  - [x] Write digital value
  - [x] Read digital value
- - [ ] Write PWM value
+ - [x] Write PWM value
  - [x] Read analog value (D4, D5 only)
  
 Servo pin (SV1 - SV3)
 
- - [ ] Set servo angle
+ - [x] Set servo angle
  - [ ] Config timing of servo
  - [ ] Set speed and direction of 360 angle servo
  
 Special function
 
  - [ ] UART transmission and receive
- - [ ] Read distant from Ultrasonic sensor 
+ - [x] Read distant from Ultrasonic sensor 
 
 ## Development support
 
