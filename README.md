@@ -31,6 +31,7 @@ Special function
 
  - [ ] UART transmission and receive
  - [x] Read distant from Ultrasonic sensor 
+ - [ ] NeoPixel write color
 
 ## Development support
 
